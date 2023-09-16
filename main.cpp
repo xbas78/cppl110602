@@ -55,29 +55,30 @@ i_like_underscore@but_its_not_allow_in _this_part.example.com
   Корректные результаты валидации адресов электронной почты. Должны
 устанавливаться как валидные адреса, так и невалидные.
 
-  Как отправить задание на проверку
-  Прислать ссылку на repl.it или файл .срр с решением. Также вы можете создать
+  Как отправить задание на проверку:
+  Прислать ссылку на repl.it или файл *.срр с решением. Также вы можете создать
 открытый репозиторий в GitHub с содержимым проекта.
 ------------------------------------------------------------------------------*/
 #include <iostream>
 
 int main() {
 
-  // Циклический ввод и анализ строки
+  // A loop to enter a user string and parse it to validate it as an email
+  // address
   while (true) {
 
-    // Ввод строки
+    // String input
     std::string email;
     std::cout << "Input email address (or exit): ";
     std::getline (std::cin, email);
 
-    // Выход по команде пользователя
+    // Exit on user demand
     if (email == "exit") return 0;
 
-    // Анализ строки
+    // String parsing
     bool invalidEmail = false;
     unsigned short len = email.length();
-    // Определение позиции символа @
+    // Determining the position of the @ character in the string
     unsigned short aPos = 0;
     for (unsigned short i = 0; i < len; i++) {
       if (email[i] == '@') {
@@ -85,45 +86,48 @@ int main() {
         break;
       }
     }
-    // Проверка строки по длине первой и второй части
+    // Checking the string by the lengths of its first and second parts
     unsigned short len1 = aPos;
     unsigned short len2 = len - aPos;
     if (len1 < 1 || len1 > 63 || len2 < 2 || len2 > 65) invalidEmail = true;
-    // Проверка строки на наличие точек ('.') в начале и в конце обеих частей
+    // Checking the string for dots ('.') at the beginning and end of both parts
     if (email[0] == '.' ||
         email[aPos - 1] == '.' ||
         email[aPos + 1] == '.' ||
         email[len - 1] == '.') {
       invalidEmail = true;
     }
-    // Проверка строки на наличие двух точек подряд и недопустимых символов
-    std::string lib = "-.!#$%&'*+-/=?^_`{|}~"; // Словарь допустимых символов
+    // Checking the string for the presence of two dots in a row
+    // and invalid characters
+    std::string lib = "-.!#$%&'*+-/=?^_`{|}~"; // Dictionary of valid characters
     if (!invalidEmail) {
-      unsigned short libLength = 21;
+      unsigned short libLength = lib.length();
       for (unsigned short i = 0; i < len && !invalidEmail; i++) {
-        // При достижении символа @, он пропускается и меняется длина словаря
+        // When the @ character is reached, it is skipped
+        // and the dictionary length is changed
         if (i == aPos) {
           i++;
           libLength = 2;
         }
-        // Проверки
+        // Checks
         bool match = false;
-        // Проверка по словарю
+        // Dictionary check
         for (unsigned short j = 0; j < libLength; j++) {
           if (email[i] == lib[j]) match = true;
         }
-        // Проверка по кодам ASCII
-        if ((email[i] > 96 && email[i] < 123) ||
-            (email[i] > 47 && email[i] < 58) ||
-            (email[i] > 64 && email[i] < 91)) match = true;
-        // Подводится итог по проверкам по словарю и кодам ASCII
+        // Checking by ASCII codes
+        if ((email[i] >= '0' && email[i] <= '9') ||
+            (email[i] >= 'a' && email[i] <= 'z') ||
+            (email[i] >= 'A' && email[i] <= 'Z')) match = true;
+        // Summarizing the results of the checking by dictionary and ASCII codes
         if (!match) invalidEmail = true;
-        // Проверка на наличие двух точек подряд. Последний символ уже не точка!
+        // Checking for the presence of two dots in a row.
+        // The last character is definitely no longer a dot!
         if (email[i] == '.' && email [i + 1] == '.') invalidEmail = true;
       }
     }
 
-    // Вывод результата
+    // Result output
     std::cout << (invalidEmail ? "No" : "Yes") << std::endl;
   }
 }
