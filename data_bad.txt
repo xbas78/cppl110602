@@ -1,0 +1,7 @@
+John..Doe@example.com (две точки не могут идти подряд)
+Abc.example.com (нет символа @)
+A@b@c@example.com (символ @ должен быть только один)
+a"b(c)d,e:f;g<h>i[j\k]l@example.com
+1234567890123456789012345678901234567890123456789012345678901234+x@example.com
+i_like_underscore@but_its_not_allow_in _this_part.example.com
+joel@lei+er.com

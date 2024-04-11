@@ -55,75 +55,67 @@ i_like_underscore@but_its_not_allow_in _this_part.example.com
   Корректные результаты валидации адресов электронной почты. Должны
 устанавливаться как валидные адреса, так и невалидные.
 
-  Как отправить задание на проверку
-  Прислать ссылку на repl.it или файл .срр с решением. Также вы можете создать
+  Как отправить задание на проверку:
+  Прислать ссылку на repl.it или файл *.срр с решением. Также вы можете создать
 открытый репозиторий в GitHub с содержимым проекта.
 ------------------------------------------------------------------------------*/
 #include <iostream>
+#include <fstream>
+
+bool checkEmail(const std::string& email) {
+  std::string lib = "!#$%&'*+-/=?^_`{|}~";
+
+  unsigned short len = email.length();
+  int partLen = 0;
+  bool firstPart = true;
+
+  for (int i = 0; i < len; i++) {
+
+    if (email[i] == '@') {
+      if (!firstPart) return false;
+      if (partLen < 1 || partLen > 63) return false;
+      partLen = 0;
+      firstPart = false;
+      continue;
+    }
+
+    partLen++;
+
+    if (email[i] == '.') {
+      if ((i == 0) || (i == len - 1)) return false;
+      if (email[i - 1] == '.') return false;
+      continue;
+    }
+
+    if ((email[i] >= '0' && email[i] <= '9') ||
+        (email[i] >= 'a' && email[i] <= 'z') ||
+        (email[i] >= 'A' && email[i] <= 'Z') || email[i] == '-') continue;
+
+    if (firstPart && lib.find_first_of(email[i]) != std::string::npos) continue;
+
+    return false;
+  }
+
+  return !(firstPart || partLen < 1 || partLen > 64);
+}
 
 int main() {
 
-  // Циклический ввод и анализ строки
-  while (true) {
+  {
+    std::cout << "Check correct emails" << std::endl;
+    std::ifstream ifs ("data_good.txt");
 
-    // Ввод строки
-    std::string email;
-    std::cout << "Input email address (or exit): ";
-    std::getline (std::cin, email);
-
-    // Выход по команде пользователя
-    if (email == "exit") return 0;
-
-    // Анализ строки
-    bool invalidEmail = false;
-    unsigned short len = email.length();
-    // Определение позиции символа @
-    unsigned short aPos = 0;
-    for (unsigned short i = 0; i < len; i++) {
-      if (email[i] == '@') {
-        aPos = i;
-        break;
-      }
-    }
-    // Проверка строки по длине первой и второй части
-    unsigned short len1 = aPos;
-    unsigned short len2 = len - aPos;
-    if (len1 < 1 || len1 > 63 || len2 < 2 || len2 > 65) invalidEmail = true;
-    // Проверка строки на наличие точек ('.') в начале и в конце обеих частей
-    if (email[0] == '.' ||
-        email[aPos - 1] == '.' ||
-        email[aPos + 1] == '.' ||
-        email[len - 1] == '.') {
-      invalidEmail = true;
-    }
-    // Проверка строки на наличие двух точек подряд и недопустимых символов
-    std::string lib = "-.!#$%&'*+-/=?^_`{|}~"; // Словарь допустимых символов
-    if (!invalidEmail) {
-      unsigned short libLength = 21;
-      for (unsigned short i = 0; i < len && !invalidEmail; i++) {
-        // При достижении символа @, он пропускается и меняется длина словаря
-        if (i == aPos) {
-          i++;
-          libLength = 2;
-        }
-        // Проверки
-        bool match = false;
-        // Проверка по словарю
-        for (unsigned short j = 0; j < libLength; j++) {
-          if (email[i] == lib[j]) match = true;
-        }
-        // Проверка по кодам ASCII
-        if ((email[i] > 96 && email[i] < 123) ||
-            (email[i] > 47 && email[i] < 58) ||
-            (email[i] > 64 && email[i] < 91)) match = true;
-        // Подводится итог по проверкам по словарю и кодам ASCII
-        if (!match) invalidEmail = true;
-        // Проверка на наличие двух точек подряд. Последний символ уже не точка!
-        if (email[i] == '.' && email [i + 1] == '.') invalidEmail = true;
-      }
-    }
-
-    // Вывод результата
-    std::cout << (invalidEmail ? "No" : "Yes") << std::endl;
+    std::string line;
+    while (std::getline(ifs, line)) std::cout << checkEmail(line) << std::endl;
   }
+
+  {
+    std::cout << "Check incorrect emails" << std::endl;
+    std::ifstream ifs("data_bad.txt");
+
+    std::string line;
+    while (std::getline(ifs, line)) std::cout << checkEmail(line) << std::endl;
+  }
+
+  return 0;
 }
